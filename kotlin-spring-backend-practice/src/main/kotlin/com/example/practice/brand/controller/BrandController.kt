@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/brand")
 class BrandController(private val brandService: BrandService) {
-    // 모든 브랜드 조회 (GET /brand)
+    // 모든 브랜드 조회 (GET /brand?page={page}&size={size})
     @GetMapping
-    fun getAllBrands(): ResponseEntity<List<BrandResponse>> {
-        val brands = brandService.getAllBrands()
+    fun getAllBrands(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "5") size: Int,
+        @RequestParam(defaultValue = "id,asc") sort: String
+    ): ResponseEntity<List<BrandResponse>> {
+        val brands = brandService.getAllBrands(page, size, sort)
         return ResponseEntity.ok(brands)
     }
 
@@ -23,6 +27,12 @@ class BrandController(private val brandService: BrandService) {
     fun getBrandById(@PathVariable id: Long): ResponseEntity<BrandResponse> {
         val brand = brandService.getBrandById(id)
         return ResponseEntity.ok(brand)
+    }
+
+    // 브랜드 이름으로 조회 (GET /brand/search)
+    @GetMapping("/search")
+    fun searchBrands(@RequestParam name: String): ResponseEntity<BrandResponse> {
+        return ResponseEntity.ok(null)
     }
 
     // 브랜드 생성 (POST /brand)

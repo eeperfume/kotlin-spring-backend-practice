@@ -6,15 +6,26 @@ import com.example.practice.brand.dto.UpdateBrandRequest
 import com.example.practice.brand.entity.Brand
 import com.example.practice.brand.repository.BrandRepository
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
 @Service
 class BrandService(private val brandRepository: BrandRepository) {
-    fun getAllBrands(): List<BrandResponse> {
-        val brands: List<BrandResponse> = brandRepository.findAll().map {
+    fun getAllBrands(page: Int, size: Int, sort: String): List<BrandResponse> {
+        val sortParams = sort.split(",")
+        val sortField = sortParams[0]
+        val sortOrder = sortParams[1]
+
+        val sortDirection = if (sortOrder.equals("desc", ignoreCase = true)) Sort.Direction.DESC else Sort.Direction.ASC
+        val pageable: Pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortField))
+
+        val brandPage = brandRepository.findAll(pageable)
+
+        return brandPage.content.map {
             BrandResponse(id = it.id, name = it.name, description = it.description)
         }
-        return brands
     }
 
     fun getBrandById(id: Long): BrandResponse {
