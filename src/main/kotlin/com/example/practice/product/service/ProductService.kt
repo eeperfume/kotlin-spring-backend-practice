@@ -1,5 +1,6 @@
 package com.example.practice.product.service
 
+import com.example.practice.brand.repository.BrandRepository
 import com.example.practice.product.dto.CreateProductRequest
 import com.example.practice.product.dto.ProductResponse
 import com.example.practice.product.dto.UpdateProductRequest
@@ -9,7 +10,10 @@ import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class ProductService(private val productRepository: ProductRepository) {
+class ProductService(
+    private val productRepository: ProductRepository,
+    private val brandRepository: BrandRepository // BrandRepository 주입
+) {
     fun getAllProducts(): List<ProductResponse> {
         val products: List<ProductResponse> = productRepository.findAll().map {
             ProductResponse(id = it.id, name = it.name, price = it.price)
@@ -24,7 +28,13 @@ class ProductService(private val productRepository: ProductRepository) {
     }
 
     fun createProduct(createProductRequest: CreateProductRequest): ProductResponse {
-        val createdProduct = Product(name = createProductRequest.name, price = createProductRequest.price)
+        // Brand를 조회하거나 없으면 예외 처리
+        val brand = brandRepository.findById(createProductRequest.brandId)
+            .orElseThrow { throw EntityNotFoundException("The brand corresponding to '${createProductRequest.brandId}' cannot be found.") }
+        val createdProduct = Product(
+            name = createProductRequest.name,
+            price = createProductRequest.price,
+            brand = brand)
         val savedProduct = productRepository.save(createdProduct)
         return ProductResponse(id = savedProduct.id, name = savedProduct.name, price = savedProduct.price)
     }

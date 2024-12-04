@@ -1,5 +1,6 @@
 package com.example.practice.product.entity
 
+import com.example.practice.brand.entity.Brand
 import jakarta.persistence.*
 
 @Entity
@@ -12,4 +13,8 @@ data class Product(
     val name: String,
 
     val price: Int,
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id") // Brand와 매핑
+    val brand: Brand
 )
