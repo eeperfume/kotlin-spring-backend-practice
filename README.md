@@ -1,1 +1,1 @@
-# react-kotlin-spring-practice
+# kotlin-spring-backend-practice
