@@ -14,7 +14,7 @@ data class Product(
 
     val price: Int,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id") // Brand와 매핑
     val brand: Brand
 )
